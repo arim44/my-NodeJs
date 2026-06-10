@@ -1,0 +1,54 @@
+// 게시판 글쓰기
+
+const express = require("express");
+const app = express();
+
+// 미들웨어
+app.use(express.json());    // POST/PUT BODY에 JSON을 담기 위해서는 이 설정 필요 안그러면 string 로만 인식
+
+// 게시글
+let posts = [{
+    id: 1,
+    title: "첫번째 글",
+    content: "안녕하세요",
+    author: "김철수"
+}];
+// let posts = [
+//     {id:1, title: "첫번째 글", content: "안녕하세요", author:"김철수"}
+// ];
+
+let nextId = 2; // 새 글에 ID 부여 위해서 사용
+
+//목록
+app.get("/posts", (req, res) => {
+    //1 json으로 posts 객체를 클라이언트에 반환하는 코드를 작성해보세요
+    res.json(posts);
+});
+
+// 글작성 app.post(); POST METHOD
+app.post("/posts", (req, res) => {
+    //req.body;   // body 데이타 json 으로 받음
+    const { title, content, author } = req.body;
+
+    if (!title || !content) {
+        return res.status(400).json({ message: "title과 content는 필수입니다." })
+    }
+    // 게시글 추가
+    const post = { id: nextId++, title: title, content: content, author: author || "익명" }
+    posts.push(post);
+
+    // 자동으로 리턴
+    res.status(201).json(post);
+});
+
+app.listen(3000, () => {
+    console.log(`http://localhost:3000 에 서버가 떴어요`);
+})
+
+
+// 26.06.08 미들웨어
+
+
+// 게시글 수정
+
+//
