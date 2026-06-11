@@ -1,0 +1,12 @@
+- nestJs 세팅
+
+sudo npm i -g @nest/cli
+sudo nest new my-app
+npm
+
+테스트 : http://localhost:3000/
+
+- nest g resource posts → rest API →  y
+    - my-app 밑에 → src → posts 생성되면 됨
+
+npm i @nestjs/mapped-types class-validator class-transformer

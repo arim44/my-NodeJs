@@ -115,48 +115,44 @@ app.post('/posts',auth, (req, res)=>{
     res.status(201).json({success:true, post});
 })
 
-// posts 에 내용 생성(인증안됨_누구나 가능 버전), 
-// app.post('/posts', (req, res)=>{
-//     const { title, content} = req.body;
-//     if(!title || !content){
-//         return res.status(400).json({success:false, message: "title, content는 필수입니다."});
-//     }
-//     // post 하나 생성해서 posts 배열에 넣기
-//     const post = {id:postId++, title, content};
-//     posts.push(post);
+// // posts 에 내용 생성(인증안됨_누구나 가능 버전), 
+// // app.post('/posts', (req, res)=>{
+// //     const { title, content} = req.body;
+// //     if(!title || !content){
+// //         return res.status(400).json({success:false, message: "title, content는 필수입니다."});
+// //     }
+// //     // post 하나 생성해서 posts 배열에 넣기
+// //     const post = {id:postId++, title, content};
+// //     posts.push(post);
 
-//     // 응답
-//     res.status(201).json({success:true, post});
-// })
+// //     // 응답
+// //     res.status(201).json({success:true, post});
+// // })
 
-const Post = sequelize.define("Post",{
-    title: { type: DataTypes.STRING, allowNull: false },
-    content: { type: DataTypes.TEXT, allowNull: false },
-    // author: { type: DataTypes.STRING }
-});
+// const Post = sequelize.define("Post",{
+//     title: { type: DataTypes.STRING, allowNull: false },
+//     content: { type: DataTypes.TEXT, allowNull: false },
+//     // author: { type: DataTypes.STRING }
+// });
 
-// 목록 가져오기
-app.get('/posts', async(req,res)=>{
-    // if(!posts){
-    //     return res.status().json({});
-    // }
-    const posts = await Post.findAll();
+// // 목록 가져오기
+// app.get('/posts', async(req,res)=>{
+//     // if(!posts){
+//     //     return res.status().json({});
+//     // }
+//     const posts = await Post.findAll();
+//     res.status(201).json({success: true, posts});
+// });
+
+// 포스트 다 보이게
+app.get('/posts',auth, (req,res) => {
+    //const posts = posts;
     res.status(201).json({success: true, posts});
-});
+})
 
-// // 토큰받아서 아이디 유효성 검사후 포스트 내용 보이게
-// app.get('/posts',auth, (req, res)=>{
-//     //토큰을 바디에서 받아서 토큰을 유효토큰 체크하고 토큰안의 내용 아이디와 네임을 리스폰스로 보내서
-//     const { title, content} = req.body;
-//     if(!title || !content){
-//         return res.status(400).json({success:false, message: "title, content는 필수입니다."});
-//     }
-//     // post 하나 생성해서 posts 배열에 넣기
-//     const post = {id:postId++, title, content, name : req.user.name};
-//     posts.push(post);
+// // 아이디로 하나만 보이게
+// app.get('/posts/:id', auth, async(req, res)=>{
 
-//     // 응답
-//     res.status(201).json({success:true, post});
 // })
 
 
