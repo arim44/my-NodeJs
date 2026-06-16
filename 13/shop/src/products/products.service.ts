@@ -1,0 +1,65 @@
+import { Injectable } from '@nestjs/common';
+import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
+import { PrismaService } from '../prisma/prisma.service';
+
+@Injectable()
+export class ProductsService {
+  // 생성자
+  constructor(private readonly prisma: PrismaService) { }
+
+  async create(createProductDto: CreateProductDto) {
+    return this.prisma.product.create({
+      data: {
+        name: createProductDto.name,
+        description: createProductDto.description,
+        price: createProductDto.price,
+        stock: createProductDto.stock,
+        sellerId: createProductDto.sellerId,
+        //M:N -> [1,2,3,4]
+        // connect -> 새 프로덕트가 들어오면, product insert 새로하고, 기존 카테고리에 연결해줘(connect) 라는 의미
+        // (id)=> ({id}) => connect : [{id:1, id:2}]
+        // (id) => {id} {id:1}
+        categories: { connect: createProductDto.categoryIds.map((id) => ({ id })) }
+      }
+    });
+  }
+
+  async findAll() {
+    return this.prisma.product.findMany({
+      include: {
+        seller: {
+          select: {id:true, name:true}
+        }, categories: true
+      },
+    });
+  }
+
+  findOne(id: number) {
+    return `This action returns a #${id} product`;
+  }
+
+  async update(id: number, updateProductDto: UpdateProductDto) {
+    return this.prisma.product.update({
+      where: {id},
+      data : {
+        name : updateProductDto.name,
+        description: updateProductDto.description,
+        price : updateProductDto.price,
+        stock: updateProductDto.stock,
+        // 있는 경우에만 카테고리 아이디 작업하고 없으면 빈객체 반환
+        // set :  이상품 분류 연결을 전달해준 목록으로 전부 다시 정해라
+        //        기존 연결된 목록에 없는것은 중간테이블 삭제
+        //        목록에 있는 것 -> 이미 연결되어있으면 유지, 없으면 insert
+        // 예) 기존에 [1,2] -> 신규 [2,3]  1은 지우고 2번은 그대로 두고, 3번은 연결 추가
+        ...(updateProductDto.categoryIds ? {
+          categories : {set : updateProductDto.categoryIds.map((cid)=>({id: cid}))}
+        } : {})
+      }
+    })
+  }
+
+  remove(id: number) {
+    return `This action removes a #${id} product`;
+  }
+}

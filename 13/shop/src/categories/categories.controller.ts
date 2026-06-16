@@ -15,22 +15,25 @@ export class CategoriesController {
   }
 
   @Get()
-  @ApiOperation({summary: "쇼핑몰 카테고리 목록"})
+  @ApiOperation({summary:"쇼핑몰 카테고리 전체조회"})
   findAll() {
     return this.categoriesService.findAll();
   }
 
   @Get(':id')
+  @ApiOperation({summary:"쇼핑몰 카테고리 하나만조회"})
   findOne(@Param('id') id: string) {
     return this.categoriesService.findOne(+id);
   }
 
   @Patch(':id')
+  @ApiOperation({summary:"쇼핑몰 카테고리 수정"})
   update(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto) {
     return this.categoriesService.update(+id, updateCategoryDto);
   }
 
   @Delete(':id')
+  @ApiOperation({summary:"쇼핑몰 카테고리 삭제"})
   remove(@Param('id') id: string) {
     return this.categoriesService.remove(+id);
   }

@@ -1,0 +1,53 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+// 6버전에서는 이렇게 수정해야함
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// auth 추가
+enum Role {
+  BUYER //구매자(기본)
+  SELLER // 판매자
+  ADMIN // 관리자
+}
+
+// 유저
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String    @default("pw1234") //auth 추가 bcrypt 암호할 예정
+  name      String
+  role      Role      @default(BUYER) //auth 추가
+  products  Product[] //사용자가 판매자로 등록한 상품들
+  createdAt DateTime  @default(now())
+}
+
+// 카테고리(분류)
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  products Product[] // 자동으로 중간테이블 생성
+}
+
+// 상품(프로덕트)
+model Product {
+  id          Int        @id @default(autoincrement())
+  name        String
+  description String
+  price       Int
+  stock       Int
+  seller      User       @relation(fields: [sellerId], references: [id]) //prisma FK 제공
+  sellerId    Int //진짜 외래키
+  categories  Category[] //m:n 자동 중간 테이블 생성
+  createdAt   DateTime   @default(now())
+}
