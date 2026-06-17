@@ -3,6 +3,5 @@ export declare class CreateProductDto {
     description: string;
     price: number;
     stock: number;
-    sellerId: number;
     categoryIds: number[];
 }

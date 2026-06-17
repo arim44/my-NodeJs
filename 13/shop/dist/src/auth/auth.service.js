@@ -70,6 +70,8 @@ let AuthService = class AuthService {
     }
     async login(dto) {
         const user = await this.userService.findByEmail(dto.email);
+        if (!user)
+            throw new common_1.UnauthorizedException("비밀번호 암호가 틀립니다");
         const isRight = await bcrypt.compare(dto.password, user.password);
         if (!user || !isRight) {
             throw new common_1.UnauthorizedException("이메일 또는 비밀번호가 틀립니다.");

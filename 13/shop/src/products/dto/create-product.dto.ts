@@ -23,9 +23,9 @@ export class CreateProductDto {
     @Min(0)
     stock : number;
 
-    @ApiProperty({example: 1, description: "User Id"})
-    @IsInt()
-    sellerId : number;
+    // @ApiProperty({example: 1, description: "User Id"})
+    // @IsInt()
+    // sellerId : number;
     
     @ApiProperty({type: [Number], example: [1,2], description:"category Id"})
     @IsArray()

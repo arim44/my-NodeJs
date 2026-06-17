@@ -2,20 +2,22 @@ import { Injectable } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PrismaService } from '../prisma/prisma.service';
+import { AuthUser } from '../common/curent-user.decorator';
+import { UPLOAD_DIR } from '../common/upload.config';
 
 @Injectable()
 export class ProductsService {
   // 생성자
   constructor(private readonly prisma: PrismaService) { }
 
-  async create(createProductDto: CreateProductDto) {
+  async create(createProductDto: CreateProductDto, sellerId:number) {
     return this.prisma.product.create({
       data: {
         name: createProductDto.name,
         description: createProductDto.description,
         price: createProductDto.price,
         stock: createProductDto.stock,
-        sellerId: createProductDto.sellerId,
+        sellerId: sellerId, // req.user.id(로그인된 유저의 아이디)  //createProductDto.sellerId,
         //M:N -> [1,2,3,4]
         // connect -> 새 프로덕트가 들어오면, product insert 새로하고, 기존 카테고리에 연결해줘(connect) 라는 의미
         // (id)=> ({id}) => connect : [{id:1, id:2}]
@@ -61,5 +63,19 @@ export class ProductsService {
 
   remove(id: number) {
     return `This action removes a #${id} product`;
+  }
+
+  //파일첨부
+  async addImage(productId: number, user:AuthUser, file: Express.Multer.File){
+    // 실제 있는 제품 가져오기
+    const product = await this.prisma.product.findUnique({
+      where: {id:productId},
+      select: {id:true, sellerId:true}
+    });
+    console.log(file.filename)
+    const image = await this.prisma.productImage.create({
+      data : {productId, storedName: file.filename}
+    });
+    return {id: image.id, url:`${UPLOAD_DIR}/${image.storedName}`}
   }
 }

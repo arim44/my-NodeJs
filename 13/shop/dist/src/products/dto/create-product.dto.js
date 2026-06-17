@@ -17,7 +17,6 @@ class CreateProductDto {
     description;
     price;
     stock;
-    sellerId;
     categoryIds;
 }
 exports.CreateProductDto = CreateProductDto;
@@ -45,11 +44,6 @@ __decorate([
     (0, class_validator_1.Min)(0),
     __metadata("design:type", Number)
 ], CreateProductDto.prototype, "stock", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ example: 1, description: "User Id" }),
-    (0, class_validator_1.IsInt)(),
-    __metadata("design:type", Number)
-], CreateProductDto.prototype, "sellerId", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ type: [Number], example: [1, 2], description: "category Id" }),
     (0, class_validator_1.IsArray)(),

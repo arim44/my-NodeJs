@@ -12,19 +12,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProductsService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
+const upload_config_1 = require("../common/upload.config");
 let ProductsService = class ProductsService {
     prisma;
     constructor(prisma) {
         this.prisma = prisma;
     }
-    async create(createProductDto) {
+    async create(createProductDto, sellerId) {
         return this.prisma.product.create({
             data: {
                 name: createProductDto.name,
                 description: createProductDto.description,
                 price: createProductDto.price,
                 stock: createProductDto.stock,
-                sellerId: createProductDto.sellerId,
+                sellerId: sellerId,
                 categories: { connect: createProductDto.categoryIds.map((id) => ({ id })) }
             }
         });
@@ -57,6 +58,17 @@ let ProductsService = class ProductsService {
     }
     remove(id) {
         return `This action removes a #${id} product`;
+    }
+    async addImage(productId, user, file) {
+        const product = await this.prisma.product.findUnique({
+            where: { id: productId },
+            select: { id: true, sellerId: true }
+        });
+        console.log(file.filename);
+        const image = await this.prisma.productImage.create({
+            data: { productId, storedName: file.filename }
+        });
+        return { id: image.id, url: `${upload_config_1.UPLOAD_DIR}/${image.storedName}` };
     }
 };
 exports.ProductsService = ProductsService;

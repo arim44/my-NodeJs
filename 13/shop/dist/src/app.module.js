@@ -15,12 +15,21 @@ const products_module_1 = require("./products/products.module");
 const users_module_1 = require("./users/users.module");
 const prisma_module_1 = require("./prisma/prisma.module");
 const auth_module_1 = require("./auth/auth.module");
+const orders_module_1 = require("./orders/orders.module");
+const serve_static_1 = require("@nestjs/serve-static");
+const upload_config_1 = require("./common/upload.config");
+const path_1 = require("path");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [categories_module_1.CategoriesModule, products_module_1.ProductsModule, users_module_1.UsersModule, prisma_module_1.PrismaModule, auth_module_1.AuthModule],
+        imports: [categories_module_1.CategoriesModule, products_module_1.ProductsModule, users_module_1.UsersModule, prisma_module_1.PrismaModule, auth_module_1.AuthModule, orders_module_1.OrdersModule,
+            serve_static_1.ServeStaticModule.forRoot({
+                rootPath: (0, path_1.join)(process.cwd(), upload_config_1.UPLOAD_DIR),
+                serveRoot: "/uploads"
+            }),
+        ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
     })
