@@ -150,3 +150,149 @@ async function bootstrap() {
 bootstrap();
 
 ```
+# JWT 인증 추가
+# Auth
+
+## 1. 관련 패키지 설치
+
+- npm i @nestjs/jwt@11 @nestjs/passport@11 passport@0.7 passport-jwt@4 bcrypt@6
+- npm i -D @types/passport-jwt@4 @types/bcrypt@6
+
+## 2. .env JWT 시크릿 추가
+
+- .env
+    
+    JMT_SECRET='dev-secret-cahnge-me’
+    
+
+## 3. 관련 모듈 생성
+
+- nest g module auth
+- nest g service auth --no-spec
+- nest g controller auth --no-spec
+- nest g guard auth/guards/jwt-auth --no-spec
+
+## 4. schema 수정
+
+```
+// auth 추가
+enum Role {
+  BUYER //구매자(기본)
+  SELLER // 판매자
+  ADMIN // 관리자
+}
+
+// 유저
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String    @default("pw1234") //auth 추가 bcrypt 암호할 예정
+  name      String
+  products  Product[] //사용자가 판매자로 등록한 상품들
+  createdAt DateTime  @default(now())
+}
+```
+
+- 터미널에서
+
+```bash
+npx prisma format
+npx prisma migrate dev --name add-auth
+npx prisma generate
+```
+
+## 5. UserService
+
+- 5.1 createUser, findByEmail 추가 
+- 5.2 UserModule UserService exports
+
+## 6. Auth 모듈
+
+```
+cd auth 
+mkdir dto
+cd dto
+create login.dto.ts
+create register.dto.ts
+
+vi src/auth/constants.ts
+
+auth.module.ts 에서 몇 가지 임포트 
+auth.service.ts
+```
+
+## Order
+
+- prisma/schema.prisma 수정
+    
+    ```
+    
+    // 주문(order) 추가
+    enum OrderStatus {
+      PENDING
+      PAID
+      SHIPPED
+      DONE        // 완료
+      CANCELLED   // 취소
+    }
+    
+    // 카트 아이템
+    model CartItem {
+      id Int @id @default(autoincrement())
+      userId Int
+      user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+      productId Int
+      product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+      quantity Int
+    
+      @@unique([userId, productId])
+    }
+    
+    // 주문(order) 추가
+    model Order {
+      id Int @id @default(autoincrement())
+      buyerId Int
+      buyer User @relation(fields: [userId], references: [id], onDelete: Cascade)
+      status OrderStatus @default(PENDING)
+      totalPrice Int
+      items OrderItem[]
+      createdAt DateTime @default(now())
+    }
+    
+    // 주문 아이템
+    model OrderItem {
+      id Int @id @default(autoincrement())
+      orderId Int
+      order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+      productId Int
+      product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+      quantity Int
+      unitPrice Int
+    }
+    ```
+    
+
+스키마 수정 후
+
+- npx prisma format → 포맷 후 에러 없으면 다음 진행
+- npx prisma migrate dev --name add-order
+- npx prisma generate
+
+## order 모듈 추가
+
+- nest g resource orders --no-spec
+- nest g resource carts --no-spec
+
+<aside>
+
+POST /products/1/images Content-Type: multipart/form-data; boundary=----... ------... Content-Disposition: form-data; name="image"; filename="photo.png" Content-Type: image/png (바이너리 데이터) ------...
+
+POST /products/1/images -F image = sky.png
+
+1. JwtAuthGurd : 인증이 되어 있는지 체크
+2. FileInterceptor (product.controller)
+    - image 필드 + imageUploadOptions multer 2-1) 멀터 내부에서 multipart 파싱 -> fileFiler(_req, file, callbakc) 실행 -> 유효한 파일(사이즈도 5메가 이내ㅡ 파일명도 정확하면 -> diskStorage upload/.png
+3. addImage (product.controller.ts) 3-1) @UploadedFile file > multipart 파일 객체
+4. product service addImage 4-1) 제품정보 확인후에 ProductImage 저장
+</aside>
+
