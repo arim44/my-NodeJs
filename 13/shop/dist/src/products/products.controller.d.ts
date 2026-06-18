@@ -6,12 +6,12 @@ export declare class ProductsController {
     private readonly productsService;
     constructor(productsService: ProductsService);
     create(createProductDto: CreateProductDto, user: AuthUser): Promise<{
+        id: number;
         name: string;
+        createdAt: Date;
         description: string;
         price: number;
         stock: number;
-        createdAt: Date;
-        id: number;
         sellerId: number;
     }>;
     addImage(id: number, file: Express.Multer.File, user: AuthUser): Promise<{
@@ -19,31 +19,31 @@ export declare class ProductsController {
         url: string;
     }>;
     findAll(): Promise<({
-        seller: {
-            name: string;
-            id: number;
-        };
         categories: {
-            name: string;
             id: number;
+            name: string;
         }[];
+        seller: {
+            id: number;
+            name: string;
+        };
     } & {
+        id: number;
         name: string;
+        createdAt: Date;
         description: string;
         price: number;
         stock: number;
-        createdAt: Date;
-        id: number;
         sellerId: number;
     })[]>;
     findOne(id: string): string;
     update(id: string, updateProductDto: UpdateProductDto): Promise<{
+        id: number;
         name: string;
+        createdAt: Date;
         description: string;
         price: number;
         stock: number;
-        createdAt: Date;
-        id: number;
         sellerId: number;
     }>;
     remove(id: string): string;
