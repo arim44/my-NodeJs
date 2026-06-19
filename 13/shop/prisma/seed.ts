@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 async function main() {
     const password = await bcrypt.hash("admin1234", 10);
 
-    // 있으면 업데이트 없으면 인서트
+    // 있으면 업데이트 없으면 업서트
     const admin = await prisma.user.upsert({
         where: { email: "admin@demo.com" },
         update: {},
