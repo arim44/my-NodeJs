@@ -4,11 +4,14 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthUser } from '../common/curent-user.decorator';
 import { UPLOAD_DIR } from '../common/upload.config';
+import { AzureBlobService } from '../azure/azure-blob/azure-blob.service';
 
 @Injectable()
 export class ProductsService {
   // 생성자
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService,
+              private readonly azureBlob: AzureBlobService,
+  ) { }
 
   async create(createProductDto: CreateProductDto, sellerId:number) {
     return this.prisma.product.create({
@@ -65,17 +68,35 @@ export class ProductsService {
     return `This action removes a #${id} product`;
   }
 
-  //파일첨부
+  //파일첨부 (애저)
   async addImage(productId: number, user:AuthUser, file: Express.Multer.File){
     // 실제 있는 제품 가져오기
     const product = await this.prisma.product.findUnique({
       where: {id:productId},
       select: {id:true, sellerId:true}
     });
-    console.log(file.filename)
+    
+    const {blobName, url} = await this.azureBlob.uploadPublic(file, 'products');
+
     const image = await this.prisma.productImage.create({
-      data : {productId, storedName: file.filename}
+      //data : {productId, storedName: file.filename}
+      data: {productId, storedName: blobName}
     });
-    return {id: image.id, url:`${UPLOAD_DIR}/${image.storedName}`}
+    //return {id: image.id, url:`${UPLOAD_DIR}/${image.storedName}`}
+    return {id: image.id, url, blobName}
   }
+
+  //  //파일첨부
+  // async addImage(productId: number, user:AuthUser, file: Express.Multer.File){
+  //   // 실제 있는 제품 가져오기
+  //   const product = await this.prisma.product.findUnique({
+  //     where: {id:productId},
+  //     select: {id:true, sellerId:true}
+  //   });
+  //   console.log(file.filename)
+  //   const image = await this.prisma.productImage.create({
+  //     data : {productId, storedName: file.filename}
+  //   });
+  //   return {id: image.id, url:`${UPLOAD_DIR}/${image.storedName}`}
+  // }
 }

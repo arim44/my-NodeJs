@@ -2,9 +2,11 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthUser } from '../common/curent-user.decorator';
+import { AzureBlobService } from '../azure/azure-blob/azure-blob.service';
 export declare class ProductsService {
     private readonly prisma;
-    constructor(prisma: PrismaService);
+    private readonly azureBlob;
+    constructor(prisma: PrismaService, azureBlob: AzureBlobService);
     create(createProductDto: CreateProductDto, sellerId: number): Promise<{
         id: number;
         name: string;
@@ -46,5 +48,6 @@ export declare class ProductsService {
     addImage(productId: number, user: AuthUser, file: Express.Multer.File): Promise<{
         id: number;
         url: string;
+        blobName: string;
     }>;
 }

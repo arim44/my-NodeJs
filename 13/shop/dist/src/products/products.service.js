@@ -12,11 +12,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProductsService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
-const upload_config_1 = require("../common/upload.config");
+const azure_blob_service_1 = require("../azure/azure-blob/azure-blob.service");
 let ProductsService = class ProductsService {
     prisma;
-    constructor(prisma) {
+    azureBlob;
+    constructor(prisma, azureBlob) {
         this.prisma = prisma;
+        this.azureBlob = azureBlob;
     }
     async create(createProductDto, sellerId) {
         return this.prisma.product.create({
@@ -64,16 +66,17 @@ let ProductsService = class ProductsService {
             where: { id: productId },
             select: { id: true, sellerId: true }
         });
-        console.log(file.filename);
+        const { blobName, url } = await this.azureBlob.uploadPublic(file, 'products');
         const image = await this.prisma.productImage.create({
-            data: { productId, storedName: file.filename }
+            data: { productId, storedName: blobName }
         });
-        return { id: image.id, url: `${upload_config_1.UPLOAD_DIR}/${image.storedName}` };
+        return { id: image.id, url, blobName };
     }
 };
 exports.ProductsService = ProductsService;
 exports.ProductsService = ProductsService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        azure_blob_service_1.AzureBlobService])
 ], ProductsService);
 //# sourceMappingURL=products.service.js.map

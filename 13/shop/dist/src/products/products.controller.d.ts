@@ -17,6 +17,7 @@ export declare class ProductsController {
     addImage(id: number, file: Express.Multer.File, user: AuthUser): Promise<{
         id: number;
         url: string;
+        blobName: string;
     }>;
     findAll(): Promise<({
         categories: {

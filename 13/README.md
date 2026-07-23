@@ -296,3 +296,13 @@ POST /products/1/images -F image = sky.png
 4. product service addImage 4-1) 제품정보 확인후에 ProductImage 저장
 </aside>
 
+## Install package
+
+## .env 업데이트
+
+## azure module 만들기
+```bash
+nest g module azure --no-spec
+nest g service azure/azure-blob --no-spec
+
+npm run start
